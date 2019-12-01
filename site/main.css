@@ -1,0 +1,26 @@
+body{
+	background-color: LtGoldenrodYello;
+	font-size: 20px;
+	font-family: segoe ui;
+}
+main{
+	background-color: Wheat;
+	box-shadow: 2px 2px black;
+	width: 85%;
+	margin: auto;
+	flex-wrap: wrap;
+	border: 1px solid black;
+	justify-content: center;
+}
+img{
+	border-radius: 30px;
+	border: 2px solid black; 
+	width: 100%;
+	max-width:100%;
+	max-height: 950px;
+	margin: auto;
+	justify-content: center;
+}
+main:hover{
+	border: 1px dotted black ;
+}
