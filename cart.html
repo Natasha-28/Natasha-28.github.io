@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Корзина - Ювелирный магазин</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .header {
+            background: #f8f9fa;
+            padding: 1rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #d4af37;
+        }
+        .nav-links a {
+            margin-left: 2rem;
+            text-decoration: none;
+            color: #333;
+        }
+        .cart-page {
+            padding: 2rem 0;
+        }
+        .cart-items {
+            margin-bottom: 2rem;
+        }
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            background: white;
+        }
+        .cart-item-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 1rem;
+        }
+        .cart-item-details {
+            flex-grow: 1;
+        }
+        .cart-item-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .cart-item-price {
+            color: #d4af37;
+            font-weight: bold;
+        }
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .quantity-input {
+            width: 50px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 0.25rem;
+        }
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
+        .cart-summary {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        .summary-total {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #d4af37;
+            border-top: 1px solid #ddd;
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .btn {
+            display: inline-block;
+            background: #d4af37;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+            width: 100%;
+            text-align: center;
+        }
+        .btn:hover {
+            background: #b8941f;
+        }
+        .empty-cart {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        .empty-cart-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .continue-shopping {
+            display: inline-block;
+            margin-top: 1rem;
+            color: #d4af37;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">💎 Ювелирный магазин</div>
+                <div class="nav-links">
+                    <a href="/">Главная</a>
+                    <a href="/products/">Каталог</a>
+                    <a href="/cart/">Корзина</a>
+                    <a href="#contacts">Контакты</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="cart-page">
+        <div class="container">
+            <h1>Корзина покупок</h1>
+            
+            {% if cart.items.all %}
+            <div class="cart-items">
+                {% for item in cart.items.all %}
+                <div class="cart-item" id="cart-item-{{ item.id }}">
+                    {% if item.product.main_image %}
+                    <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}" class="cart-item-image">
+                    {% else %}
+                    <img src="https://via.placeholder.com/100" alt="No image" class="cart-item-image">
+                    {% endif %}
+                    
+                    <div class="cart-item-details">
+                        <div class="cart-item-name">{{ item.product.name }}</div>
+                        <div class="cart-item-price">{{ item.product.price }} руб. × {{ item.quantity }} = {{ item.total_price }} руб.</div>
+                        
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" onclick="updateQuantity({{ item.id }}, 'decrease')">-</button>
+                            <span class="quantity-input" id="quantity-{{ item.id }}">{{ item.quantity }}</span>
+                            <button class="quantity-btn" onclick="updateQuantity({{ item.id }}, 'increase')">+</button>
+                        </div>
+                    </div>
+                    
+                    <button class="remove-btn" onclick="removeFromCart({{ item.id }})">Удалить</button>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="cart-summary">
+                <div class="summary-row">
+                    <span>Количество товаров:</span>
+                    <span id="total-items">{{ cart.items.count }}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Общая стоимость:</span>
+                    <span class="summary-total" id="total-price">
+                        {% with total=0 %}
+                            {% for item in cart.items.all %}
+                                {% widthratio item.product.price 1 item.quantity as item_total %}
+                                {% with total=total|add:item_total %}
+                                {% endwith %}
+                            {% endfor %}
+                            {{ total }} руб.
+                        {% endwith %}
+                    </span>
+                </div>
+                
+                <a href="/" class="btn">Оформить заказ</a>
+                <a href="/products/" class="continue-shopping">← Продолжить покупки</a>
+            </div>
+            {% else %}
+            <div class="empty-cart">
+                <div class="empty-cart-icon">🛒</div>
+                <h2>Ваша корзина пуста</h2>
+                <p>Добавьте товары из каталога, чтобы сделать заказ</p>
+                <a href="/products/" class="btn">Перейти в каталог</a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <footer class="footer" id="contacts">
+        <div class="container">
+            <p>💎 Ювелирный магазин</p>
+            <p>Телефон: +7 (999) 123-45-67</p>
+            <p>Email: info@jewelry.ru</p>
+        </div>
+    </footer>
+
+    <script>
+        function updateQuantity(itemId, action) {
+            fetch(`/cart/update/${itemId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `action=${action}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (action === 'remove') {
+                        document.getElementById(`cart-item-${itemId}`).remove();
+                    } else {
+                        document.getElementById(`quantity-${itemId}`).textContent = data.quantity;
+                    }
+                    // Перезагружаем страницу для обновления итогов
+                    location.reload();
+                }
+            });
+        }
+
+        function removeFromCart(itemId) {
+            if (confirm('Удалить товар из корзины?')) {
+                updateQuantity(itemId, 'remove');
+            }
+        }
+    </script>
+</body>
+</html>

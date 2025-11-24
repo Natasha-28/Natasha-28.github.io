@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ювелирный магазин</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .header {
+            background: #f8f9fa;
+            padding: 1rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #d4af37;
+        }
+        .nav-links a {
+            margin-left: 2rem;
+            text-decoration: none;
+            color: #333;
+        }
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+        .products {
+            padding: 4rem 0;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .product-card img {
+            max-width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .product-price {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #d4af37;
+            margin: 0.5rem 0;
+        }
+        .btn {
+            display: inline-block;
+            background: #d4af37;
+            color: white;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+        }
+        .order-form {
+            max-width: 500px;
+            margin: 2rem auto;
+            padding: 2rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">💎 Ювелирный магазин</div>
+                <div class="nav-links">
+                    <a href="/">Главная</a>
+                    <a href="/products/">Каталог</a>
+                    <a href="/cart/">Корзина</a>
+                    <a href="#contacts">Контакты</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Эксклюзивные ювелирные изделия</h1>
+            <p>Уникальные украшения из золота, серебра и платины</p>
+            <a href="/products/" class="btn" style="margin-top: 1rem;">Смотреть каталог</a>
+        </div>
+    </section>
+
+    <section class="products">
+        <div class="container">
+            <h2>Популярные товары</h2>
+            <div class="product-grid">
+                {% for product in products %}
+                <div class="product-card">
+                    {% if product.main_image %}
+                    <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
+                    {% else %}
+                    <img src="https://via.placeholder.com/250" alt="No image">
+                    {% endif %}
+                    <h3>{{ product.name }}</h3>
+                    <p>{{ product.get_material_display }}, {{ product.purity }} проба</p>
+                    <div class="product-price">{{ product.price }} руб.</div>
+                    <button class="btn" onclick="addToCart({{ product.id }})">В корзину</button>
+                </div>
+                {% empty %}
+                <p>Товаров пока нет</p>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2>Оформление заказа</h2>
+        <div class="order-form">
+            <form id="orderForm">
+                <div class="form-group">
+                    <label for="customer_name">Ваше имя:</label>
+                    <input type="text" id="customer_name" name="customer_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer_phone">Телефон:</label>
+                    <input type="tel" id="customer_phone" name="customer_phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer_email">Email:</label>
+                    <input type="email" id="customer_email" name="customer_email" required>
+                </div>
+                <div class="form-group">
+                    <label for="delivery_address">Адрес доставки:</label>
+                    <textarea id="delivery_address" name="delivery_address" required></textarea>
+                </div>
+                
+                <!-- Выбор способа оплаты -->
+                <div class="form-group">
+                    <label>Способ оплаты:</label>
+                    <div>
+                        <input type="radio" id="payment_courier" name="payment_method" value="courier" checked>
+                        <label for="payment_courier">Оплата курьеру</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="payment_card" name="payment_method" value="card">
+                        <label for="payment_card">Картой при получении</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="payment_cash" name="payment_method" value="cash">
+                        <label for="payment_cash">Наличными при получении</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="payment_online" name="payment_method" value="online">
+                        <label for="payment_online">Онлайн оплата</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="telegram_chat_id">Telegram Chat ID (для уведомлений):</label>
+                    <input type="number" id="telegram_chat_id" name="telegram_chat_id" placeholder="Необязательно">
+                    <small>Укажите ваш Telegram ID для получения уведомлений о заказе</small>
+                </div>
+                <button type="submit" class="btn">Оформить заказ</button>
+            </form>
+            <div id="orderResult" style="margin-top: 1rem;"></div>
+        </div>
+    </section>
+
+    <footer class="footer" id="contacts">
+        <div class="container">
+            <p>💎 Ювелирный магазин</p>
+            <p>Телефон: +7 (999) 123-45-67</p>
+            <p>Email: info@jewelry.ru</p>
+        </div>
+    </footer>
+
+    <script>
+        function addToCart(productId) {
+            fetch(`/cart/add/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Товар добавлен в корзину!');
+                }
+            });
+        }
+
+        // Обновляем форму заказа для отправки payment_method
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const resultDiv = document.getElementById('orderResult');
+            
+            fetch("/create-order/", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    resultDiv.innerHTML = `<div style="color: green;">✅ ${data.message}</div>`;
+                    document.getElementById('orderForm').reset();
+                } else {
+                    resultDiv.innerHTML = `<div style="color: red;">❌ ${data.message}</div>`;
+                }
+            })
+            .catch(error => {
+                resultDiv.innerHTML = `<div style="color: red;">❌ Ошибка: ${error}</div>`;
+            });
+        });
+    </script>
+</body>
+</html>

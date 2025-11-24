@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Каталог - Ювелирный магазин</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .header {
+            background: #f8f9fa;
+            padding: 1rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #d4af37;
+        }
+        .nav-links a {
+            margin-left: 2rem;
+            text-decoration: none;
+            color: #333;
+        }
+        .catalog {
+            padding: 2rem 0;
+        }
+        .filters {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        .filter-group {
+            margin-bottom: 1rem;
+        }
+        .filter-group label {
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+        .filter-group select, .filter-group input {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .product-card img {
+            max-width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        .product-price {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #d4af37;
+            margin: 1rem 0;
+        }
+        .btn {
+            display: inline-block;
+            background: #d4af37;
+            color: white;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+        }
+        .categories {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .category-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d4af37;
+            border-radius: 20px;
+            background: white;
+            color: #d4af37;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .category-btn.active {
+            background: #d4af37;
+            color: white;
+        }
+        .footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">💎 Ювелирный магазин</div>
+                <div class="nav-links">
+                    <a href="/">Главная</a>
+                    <a href="/products/">Каталог</a>
+                    <a href="/cart/">Корзина</a>
+                    <a href="#contacts">Контакты</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="catalog">
+        <div class="container">
+            <h1>Каталог ювелирных изделий</h1>
+            
+            <!-- Категории -->
+            <div class="categories">
+                <a href="/products/" class="category-btn {% if not current_category %}active{% endif %}">Все товары</a>
+                {% for category in categories %}
+                <a href="?category={{ category.slug }}" class="category-btn {% if current_category == category.slug %}active{% endif %}">
+                    {{ category.name }}
+                </a>
+                {% endfor %}
+            </div>
+
+            <!-- Фильтры -->
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Материал:</label>
+                    <select onchange="filterByMaterial(this.value)">
+                        <option value="">Все материалы</option>
+                        <option value="gold">Золото</option>
+                        <option value="silver">Серебро</option>
+                        <option value="platinum">Платина</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Сетка товаров -->
+            <div class="product-grid">
+                {% for product in products %}
+                <div class="product-card">
+                    {% if product.main_image %}
+                    <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
+                    {% else %}
+                    <img src="https://via.placeholder.com/250" alt="No image">
+                    {% endif %}
+                    <h3>{{ product.name }}</h3>
+                    <p>{{ product.get_material_display }}, {{ product.purity }} проба</p>
+                    <p>Вес: {{ product.weight }} г</p>
+                    <div class="product-price">{{ product.price }} руб.</div>
+                    <button class="btn" onclick="addToCart({{ product.id }})">В корзину</button>
+                </div>
+                {% empty %}
+                <p>Товаров в этой категории пока нет</p>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer" id="contacts">
+        <div class="container">
+            <p>💎 Ювелирный магазин</p>
+            <p>Телефон: +7 (999) 123-45-67</p>
+            <p>Email: info@jewelry.ru</p>
+        </div>
+    </footer>
+
+    <script>
+        function addToCart(productId) {
+            fetch(`/cart/add/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Товар добавлен в корзину!');
+                }
+            });
+        }
+
+        function filterByMaterial(material) {
+            const url = new URL(window.location.href);
+            if (material) {
+                url.searchParams.set('material', material);
+            } else {
+                url.searchParams.delete('material');
+            }
+            window.location.href = url.toString();
+        }
+
+        // Установка активного фильтра материала
+        const urlParams = new URLSearchParams(window.location.search);
+        const materialFilter = urlParams.get('material');
+        if (materialFilter) {
+            document.querySelector('select').value = materialFilter;
+        }
+    </script>
+</body>
+</html>
